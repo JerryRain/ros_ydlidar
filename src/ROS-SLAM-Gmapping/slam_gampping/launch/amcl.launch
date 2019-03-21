@@ -1,0 +1,70 @@
+<launch>
+  <master auto="start"/>
+
+  <include file="$(find ydlidar)/launch/x4_laserscan_gmapping.launch" />
+
+  <!--node pkg="tf" type="static_transform_publisher" name="map_2_laser_frame" args="0.0 0.0 0.2 0.0 0.0 0.0 /map /laser_frame 40"/-->
+
+  <!-- Map server -->
+  <arg name="map_file" default="/home/rain/mymap.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+  <!-- amcl node -->
+  <node pkg="amcl" type="amcl" name="amcl" output="screen">
+  <remap from="scan" to="scan"/>
+
+  <!-- Publish scans from best pose at a max of 10 Hz -->
+  <param name="initial_pose_x" value="0.0"/>
+  <param name="initial_pose_y" value="0.0"/>
+  <param name="initial_pose_a" value="0.0"/>
+  <param name="use_map_topic" value="true"/>
+  <param name="odom_model_type" value="diff"/>
+  <param name="odom_alpha5" value="0.1"/>
+  <param name="transform_tolerance" value="0.5" />
+  <param name="gui_publish_rate" value="10.0"/>
+  <param name="laser_max_beams" value="300"/>
+  <param name="min_particles" value="500"/>
+  <param name="max_particles" value="5000"/>
+  <param name="kld_err" value="0.1"/>
+  <param name="kld_z" value="0.99"/>
+  <param name="odom_alpha1" value="0.1"/>
+  <param name="odom_alpha2" value="0.1"/>
+  <!-- translation std dev, m -->
+  <param name="odom_alpha3" value="0.1"/>
+  <param name="odom_alpha4" value="0.1"/>
+  <param name="laser_z_hit" value="0.9"/>
+  <param name="laser_z_short" value="0.05"/>
+  <param name="laser_z_max" value="0.05"/>
+  <param name="laser_z_rand" value="0.5"/>
+  <param name="laser_sigma_hit" value="0.2"/>
+  <param name="laser_lambda_short" value="0.1"/>
+  <param name="laser_lambda_short" value="0.1"/>
+  <param name="laser_model_type" value="likelihood_field"/>
+  <!-- <param name="laser_model_type" value="beam"/> -->
+  <param name="laser_min_range" value="1"/>
+  <param name="laser_max_range" value="8"/>
+  <param name="laser_likelihood_max_dist" value="2.0"/>
+  <param name="update_min_d" value="0.2"/>
+  <param name="update_min_a" value="0.5"/>
+  <param name="resample_interval" value="1"/>
+  <param name="transform_tolerance" value="0.1"/>
+  <param name="recovery_alpha_slow" value="0.0"/>
+  <param name="recovery_alpha_fast" value="0.0"/>
+  </node>
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find slam_gampping)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find slam_gampping)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />   
+    <rosparam file="$(find slam_gampping)/param/local_costmap_params.yaml" command="load" />   
+    <rosparam file="$(find slam_gampping)/param/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find slam_gampping)/param/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find slam_gampping)/param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find slam_gampping)/param/global_planner_params.yaml" command="load" />
+    <rosparam file="$(find slam_gampping)/param/navfn_global_planner_params.yaml" command="load" />
+  </node>
+  <include file="$(find navigation_launch)/launch/geotiff_mapper.launch" />
+  
+  <include file="$(find smartcar_model)/launch/smartcar.launch" />
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find navigation_launch)/rviz_cfg/nav_test.rviz"/>
+
+</launch>
