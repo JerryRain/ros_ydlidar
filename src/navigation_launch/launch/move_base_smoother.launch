@@ -1,0 +1,67 @@
+<launch>
+
+  <!-- Velocity smoother nodelet; we must provide the absolute name of nodelet manager, as we can be in an application namespace 
+  <node pkg="nodelet" type="nodelet" name="navigation_velocity_smoother" 
+  			args="load yocs_velocity_smoother/VelocitySmootherNodelet /mobile_base_nodelet_manager">
+    <rosparam file="$(find navigation_launch)/config/vel_smoother.yaml" command="load"/>
+    <remap from="navigation_velocity_smoother/smooth_cmd_vel" to="/cmd_vel_mux/input/navigation"/>
+    <remap from="navigation_velocity_smoother/robot_cmd_vel" to="/mobile_base/commands/velocity"/>
+    <remap from="navigation_velocity_smoother/odometry" to="/odom"/>
+  </node>
+  -->
+  
+  <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager"/>
+  <node pkg="nodelet" type="nodelet" name="velocity_smoother" args="load yocs_velocity_smoother/VelocitySmootherNodelet nodelet_manager" output="screen">
+    <rosparam file="$(find yocs_velocity_smoother)/param/standalone.yaml" command="load"/>
+    <remap from="velocity_smoother/odometry" to="odom"/>
+    <remap from="velocity_smoother/robot_cmd_vel" to="cmd_vel/robot_cmd_vel"/>
+    <remap from="velocity_smoother/raw_cmd_vel" to="cmd_vel/input"/>
+    <remap from="velocity_smoother/smooth_cmd_vel" to="cmd_vel/output"/>
+  </node>
+  <!--<include file="$(find yocs_velocity_smoother)/launch/velocity_smoother.launch" />-->
+
+  <!-- Move base -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+  <!-- from: https://github.com/ros-planning/navigation_tutorials/blob/indigo-devel/navigation_stage/move_base_config/move_base.xml
+  	<param name="footprint_padding" value="0.01" />
+    <param name="controller_frequency" value="10.0" />
+    <param name="controller_patience" value="3.0" />
+
+    <param name="oscillation_timeout" value="30.0" />
+    <param name="oscillation_distance" value="0.5" />
+   -->
+   
+   	<!--<param name="base_global_planner" value="carrot_planner/CarrotPlanner"/>-->
+   	
+   	<!-- modified papameters -->
+    <rosparam file="$(find slam_gampping)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find slam_gampping)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />   
+    <rosparam file="$(find slam_gampping)/param/local_costmap_params.yaml" command="load" />   
+    <rosparam file="$(find slam_gampping)/param/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find slam_gampping)/param/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find slam_gampping)/param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find slam_gampping)/param/global_planner_params.yaml" command="load" />
+    <rosparam file="$(find slam_gampping)/param/navfn_global_planner_params.yaml" command="load" />
+     
+    
+    <!--  
+    <rosparam file="$(find navigation_launch)/config/raspberry_pi/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find navigation_launch)/config/raspberry_pi/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find navigation_launch)/config/raspberry_pi/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find navigation_launch)/config/raspberry_pi/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find navigation_launch)/config/raspberry_pi/base_local_planner_params.yaml" command="load" />-->
+    
+    
+    <!-- parameters from ros_by_example
+    <rosparam file="$(find navigation_launch)/config/ros_by_example/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find navigation_launch)/config/ros_by_example/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find navigation_launch)/config/ros_by_example/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find navigation_launch)/config/ros_by_example/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find navigation_launch)/config/ros_by_example/base_local_planner_params.yaml" command="load" />
+    -->
+	
+    <remap from="cmd_vel" to="cmd_vel/input"/>
+    <!--
+    <remap from="odom" to="/odom"/>-->
+  </node>
+</launch>

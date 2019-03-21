@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+
+<launch>
+  <param name="use_sim_time" value="false" />
+  
+  <!-- EDIT THIS LINE TO REFLECT THE NAME OF YOUR OWN MAP FILE 
+       Can also be overridden on the command line -->
+  <arg name="map" default="test_map.yaml" />
+  
+  
+  <!-- should be moved to raspberry pi with laser link tf
+  <node pkg="urg_node" type="urg_node" name="urg_node">
+    <param name="ip_address" type="string" value="192.168.0.10"/>
+  </node>  
+  <node pkg="tf" type="static_transform_publisher" name="base_link_2_laser_link" args="0.28 0 0.33 0 0 0 /base_link /laser 100"/>-->
+  
+  <!--<node pkg="tf" type="static_transform_publisher" name="base_link_2_laser_link" args="0 0 0 0 0 0 /base_link /laser 100"/> -->
+  
+  
+  <!-- should be moved to raspberry pi with laser link tf -->
+  <!-- fake odometry for AMCL by using the laser_scan_matcher
+  <node pkg="laser_scan_matcher" type="laser_scan_matcher_node" name="laser_scan_matcher_node" output="screen"> 
+  <node pkg="laser_scan_matcher" type="laser_scan_matcher_odom_node" name="laser_scan_matcher_odom_node" output="screen">
+    <param name="base_frame" value = "/base_link"/>
+    <param name="fixed_frame" value = "/odom"/>
+    
+    <param name="publish_tf" value="true"/>
+    <param name="publish_odom" value="true"/>
+        
+    <param name="use_cloud_input" value="false"/>
+    <param name="use_odom" value="false"/>
+    <param name="use_imu" value="false"/>
+        
+    <param name="use_alpha_beta" value="true"/>
+    <param name="max_iterations" value="10"/> 
+  </node>-->
+
+  <!-- Run the map server with the desired map -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find navigation_launch)/maps/$(arg map)"/>
+  <!-- tf /map to /odom, done by amcl
+  <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 /map /odom 100"/>  -->
+  
+  
+  <!-- Fire up AMCL -->
+  <include file="$(find navigation_launch)/launch/amcl.launch" />
+
+
+  <!-- Start move_base -->
+  <include file="$(find navigation_launch)/launch/move_base.launch" />
+  
+  <!-- move_base result: cmd_vel transmit to raspberry pi by tcp 
+  <node pkg="ros_tcp_comm" type="sender.py" name="sender" output="screen">
+      <param name="topic_name" type="string" value="/cmd_vel"/>
+      <param name="port_number" type="int" value="13000"/>
+      <param name="ip" type="string" value="192.168.3.107"/> 
+	</node>-->
+
+  <!-- Trajectory Recorder -->
+  <include file="$(find navigation_launch)/launch/geotiff_mapper.launch" />
+
+  <include file="$(find smartcar_model)/launch/smartcar.launch" />
+  
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find navigation_launch)/rviz_cfg/nav_test.rviz"/>
+
+  <!-- Start the move_base's decision delivered node
+  <include file="$(find motor_driver_launch)/launch/motor_driver.launch" />
+   -->
+
+</launch>
