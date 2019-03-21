@@ -1,2 +1,2 @@
 # ros_ydlidar
-x4-lidar smartcar_rviz navigation movebase
+x4-lidar gmapping smartcar_rviz navigation movebase
