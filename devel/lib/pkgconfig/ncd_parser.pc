@@ -1,0 +1,8 @@
+prefix=/home/rain/ydlidar_ws/devel
+
+Name: ncd_parser
+Description: Description of ncd_parser
+Version: 0.3.2
+Cflags: 
+Libs: -L/home/rain/ydlidar_ws/devel/lib 
+Requires: 

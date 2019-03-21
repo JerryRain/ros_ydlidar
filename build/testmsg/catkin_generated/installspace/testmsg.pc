@@ -1,0 +1,8 @@
+prefix=/home/rain/ydlidar_ws/install
+
+Name: testmsg
+Description: Description of testmsg
+Version: 0.0.0
+Cflags: -I/home/rain/ydlidar_ws/install/include
+Libs: -L/home/rain/ydlidar_ws/install/lib 
+Requires: message_runtime

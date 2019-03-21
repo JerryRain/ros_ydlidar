@@ -1,0 +1,8 @@
+prefix=/home/rain/ydlidar_ws/install
+
+Name: robot1_description
+Description: Description of robot1_description
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/rain/ydlidar_ws/install/lib 
+Requires: 

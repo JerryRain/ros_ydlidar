@@ -1,0 +1,8 @@
+prefix=/home/rain/ydlidar_ws/devel
+
+Name: ros_arduino_firmware
+Description: Description of ros_arduino_firmware
+Version: 0.2.0
+Cflags: 
+Libs: -L/home/rain/ydlidar_ws/devel/lib 
+Requires: 
